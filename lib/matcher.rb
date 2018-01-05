@@ -52,9 +52,12 @@ module AddressTokens
         city_tokens = I18n.transliterate(city[0]).downcase.split
 
         if tokens[-1] == city_tokens[-1]
-          first_tokens      = tokens.map      { |token| token[0] }.join
-          first_city_tokens = city_tokens.map { |token| token[0] }.join
-          choices << [city[0], first_tokens, first_city_tokens] if Regexp.new("#{first_city_tokens}$").match? first_tokens
+          first_tokens              = tokens.map         { |token| token[0] }.join
+          first_city_tokens         = city_tokens.map    { |token| token[0] }.join
+          first_shorten_city_tokens = city_tokens.select { |token| token.size > 2 }.map { |token| token[0] }.join
+
+          choices << [city[0], first_tokens, first_city_tokens] if Regexp.new("#{first_city_tokens}$").match?         first_tokens
+          choices << [city[0], first_tokens, first_city_tokens] if Regexp.new("#{first_shorten_city_tokens}$").match? first_tokens
         end
       end
 

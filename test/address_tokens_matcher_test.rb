@@ -64,6 +64,21 @@ describe AddressTokens::Matcher do
 
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São José do R Preto -  SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S. J. do R. Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib Preto -  SP'
+      expect(matches[:city_name]).must_equal 'Ribeirão Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib. Preto -  SP'
+      expect(matches[:city_name]).must_equal 'Ribeirão Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J R Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J Rio Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
     end
   end
 end
