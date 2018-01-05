@@ -94,53 +94,53 @@ describe AddressTokens::Matcher do
     end
   end
 
-  #describe 'address' do
-    #before do
-      #@address = 'this is some mixed tokens on address 123 neighborhood'
-    #end
+  describe 'address' do
+    before do
+      @address = 'this is some mixed tokens on address 123 neighborhood'
+    end
 
-    #it 'must extract by exact match' do
-      #matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São José do Rio Preto -  SP')
-      #expect(matches[:address]).must_equal @address
-    #end
+    it 'must extract by exact match' do
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São José do Rio Preto -  SP')
+      expect(matches[:address]).must_equal @address
+    end
 
-    #it 'must extract by exact match removing spaces' do
-      #matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São    José  do     Rio    Preto   -  SP')
-      #expect(matches[:address]).must_equal @address
-    #end
+    it 'must extract by exact match removing spaces' do
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São    José  do     Rio    Preto   -  SP')
+      expect(matches[:address]).must_equal @address
+    end
 
-    #it 'must extract transliterated' do
-      #matches = @matcher.match @finder.string
-      #expect(matches[:address]).must_equal @address
-    #end
+    it 'must extract transliterated' do
+      matches = @matcher.match @finder.string
+      expect(matches[:address]).must_equal @address
+    end
 
-    #it 'must extract written on a different way' do
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+    it 'must extract written on a different way' do
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São J do Rio Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São J do Rio Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São José do R Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São José do R Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S. J. do R. Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S. J. do R. Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib. Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib. Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J R Preto -  SP'
-      #expect(matches[:address]).must_equal @address
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J R Preto -  SP'
+      expect(matches[:address]).must_equal @address
 
-      #matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J Rio Preto -  SP'
-      #expect(matches[:address]).must_equal @address
-    #end
-  #end
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J Rio Preto -  SP'
+      expect(matches[:address]).must_equal @address
+    end
+  end
 end

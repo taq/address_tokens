@@ -7,7 +7,7 @@ module AddressTokens
     def match(str)
       state_info   = find_state(str)
       city_info    = find_city(str, state_info)
-      address_info = find_address(city_info)
+      address_info = find_address(str, city_info)
 
       {
         state_abbr:     state_info[:state],
@@ -82,8 +82,9 @@ module AddressTokens
       nil
     end
 
-    def find_address(city_info)
-      { address: nil }
+    def find_address(str, city_info)
+      return { address: str[0 ... city_info[:start_at]].strip } if city_info[:start_at] > 0
+      { address: str.split(city_info[:city_string])[0].strip }
     end
   end
 end
