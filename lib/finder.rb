@@ -4,11 +4,11 @@ require 'i18n'
 module AddressTokens
   class Finder
     attr_accessor :states, :cities, :state_separator
-    attr_reader :city_tokens, :matcher, :string
+    attr_reader :city_tokens, :string
 
     def initialize(str)
       raise Exception, 'String is null or empty' if str.strip.size < 1
-      @string, @states, @cities, @matcher = str, {}, {}, nil
+      @string, @states, @cities, = str, {}, {}
       I18n.config.available_locales = :en
       @state_separator = '-'
     end
@@ -21,7 +21,7 @@ module AddressTokens
       raise ArgumentError, 'No states found' if @states.size == 0
       raise ArgumentError, 'No cities found' if @cities.size == 0
       transliterate_cities
-      @matcher = Matcher.new(self)
+      Matcher.new(self).match(@string)
     end
 
     private

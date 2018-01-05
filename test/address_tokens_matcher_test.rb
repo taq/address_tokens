@@ -1,5 +1,6 @@
 require "test_helper"
 require_relative '../lib/state_not_found'
+require_relative '../lib/city_not_found'
 
 describe AddressTokens::Matcher do
   before do
@@ -7,7 +8,7 @@ describe AddressTokens::Matcher do
     @finder.load(:states, '/tmp/states.yml')
     @finder.load(:cities, '/tmp/cities.yml')
     @finder.find
-    @matcher = @finder.matcher
+    @matcher = AddressTokens::Matcher.new(@finder)
   end
 
   describe 'state' do
@@ -26,8 +27,26 @@ describe AddressTokens::Matcher do
       }.must_raise AddressTokens::StateNotFound
     end
 
+    it 'wont find with weird city' do
+      #-> {
+        #expect(@matcher.match('address here city - SP'))
+      #}.must_raise AddressTokens::CityNotFound
+    end
+
     it 'must extract by exact match' do
       matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São José do Rio Preto -  SP')
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_start_at]).must_equal 54
+    end
+
+    it 'must extract by exact match removing spaces' do
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São    José  do     Rio    Preto   -  SP')
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_start_at]).must_equal 54
+    end
+
+    it 'must extract transliterated' do
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São    José  do     Rio    Preto   -  SP')
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_start_at]).must_equal 54
     end

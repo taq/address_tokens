@@ -31,13 +31,15 @@ module AddressTokens
       cities = @finder.city_tokens[state_info[:state]]
       raise StateNotFound, "State #{state_info[:state]} not found on state data" if cities.nil?
 
-      without_state  = str[0 .. state_info[:start_at] - 1].strip
+      without_state  = str[0 .. state_info[:start_at] - 1].strip.gsub(/\s{2,}/, ' ')
       transliterated = I18n.transliterate(without_state)
 
       cities.each do |city|
         exact = Regexp.new("#{city[0]}$")
         return { city_name: city[0], start_at: without_state.rindex(city[0]) } if without_state =~ exact
       end
+
+      #raise CityNotFound, "City not found"
       { city_name: nil, start_at: -1 }
     end
   end
