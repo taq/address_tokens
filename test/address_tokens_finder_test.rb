@@ -96,7 +96,7 @@ describe AddressTokens::Finder do
       finder.find
 
       expect(finder.city_tokens['AC'][-10]).must_equal ['Plácido de Castro', 'placido de castro', ['placido', 'de', 'castro']]
-      expect(finder.city_tokens['AC'][-1]).must_equal  ['Xapuri', 'xapuri', ['xapuri']]
+      expect(finder.city_tokens['AC'][-1]).must_equal  ['Xapuri', 'xapuri']
     end
 
     it 'must have a matcher' do

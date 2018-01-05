@@ -48,7 +48,7 @@ module AddressTokens
           tokens << tdown
           
           splitted = tdown.split
-          tokens << splitted if splitted.size > 0
+          tokens << splitted if splitted.size > 1
           @city_tokens[state] << tokens
         end
       end
