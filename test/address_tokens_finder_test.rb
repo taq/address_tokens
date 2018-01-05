@@ -98,5 +98,12 @@ describe AddressTokens::Finder do
       expect(finder.city_tokens['AC'][-10]).must_equal ['Plácido de Castro', 'placido de castro', ['placido', 'de', 'castro']]
       expect(finder.city_tokens['AC'][-1]).must_equal  ['Xapuri', 'xapuri', ['xapuri']]
     end
+
+    it 'must have a matcher' do
+      finder.load(:states, '/tmp/states.yml')
+      finder.load(:cities, '/tmp/cities.yml')
+      finder.find
+      expect(finder.matcher).wont_be_nil
+    end
   end
 end
