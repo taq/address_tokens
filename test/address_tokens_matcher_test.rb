@@ -28,9 +28,9 @@ describe AddressTokens::Matcher do
     end
 
     it 'wont find with weird city' do
-      #-> {
-        #expect(@matcher.match('address here city - SP'))
-      #}.must_raise AddressTokens::CityNotFound
+      -> {
+        expect(@matcher.match('address here city - SP'))
+      }.must_raise AddressTokens::CityNotFound
     end
 
     it 'must extract by exact match' do
@@ -49,6 +49,21 @@ describe AddressTokens::Matcher do
       matches = @matcher.match @finder.string
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_start_at]).must_equal 54
+    end
+
+    it 'must extract written on a different way' do
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_start_at]).must_equal -1
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São J do Rio Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São José do R Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
     end
   end
 end

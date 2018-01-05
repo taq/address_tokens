@@ -34,6 +34,35 @@ module AddressTokens
       without_state  = str[0 .. state_info[:start_at] - 1].strip.gsub(/\s{2,}/, ' ')
       transliterated = I18n.transliterate(without_state).downcase
 
+      exact_or_trans = find_city_by_exact_or_trans(cities, without_state, transliterated)
+      return exact_or_trans if !exact_or_trans.nil?
+
+      tokenized = find_city_by_tokenized(cities, transliterated)
+      return tokenized if !tokenized.nil?
+
+      raise CityNotFound, "City not found"
+    end
+
+    def find_city_by_tokenized(cities, transliterated)
+      choices = []
+
+      cities.each do |city|
+        exact       = Regexp.new("#{city[0]}$")
+        tokens      = transliterated.split
+        city_tokens = I18n.transliterate(city[0]).downcase.split
+
+        if tokens[-1] == city_tokens[-1]
+          first_tokens      = tokens.map      { |token| token[0] }.join
+          first_city_tokens = city_tokens.map { |token| token[0] }.join
+          choices << [city[0], first_tokens, first_city_tokens] if Regexp.new("#{first_city_tokens}$").match? first_tokens
+        end
+      end
+
+      return nil if choices.size == 0
+      { city_name: choices.sort_by { |choice| choice[2].size }.reverse[0][0], start_at: -1 }
+    end
+
+    def find_city_by_exact_or_trans(cities, without_state, transliterated)
       cities.each do |city|
         exact = Regexp.new("#{city[0]}$")
         trans = Regexp.new("#{city[1]}$")
@@ -41,9 +70,7 @@ module AddressTokens
         return { city_name: city[0], start_at: without_state.rindex(city[0])  } if exact.match? without_state
         return { city_name: city[0], start_at: transliterated.rindex(city[1]) } if trans.match? transliterated
       end
-
-      #raise CityNotFound, "City not found"
-      { city_name: nil, start_at: -1 }
+      nil
     end
   end
 end
