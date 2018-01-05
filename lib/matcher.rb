@@ -32,11 +32,14 @@ module AddressTokens
       raise StateNotFound, "State #{state_info[:state]} not found on state data" if cities.nil?
 
       without_state  = str[0 .. state_info[:start_at] - 1].strip.gsub(/\s{2,}/, ' ')
-      transliterated = I18n.transliterate(without_state)
+      transliterated = I18n.transliterate(without_state).downcase
 
       cities.each do |city|
         exact = Regexp.new("#{city[0]}$")
-        return { city_name: city[0], start_at: without_state.rindex(city[0]) } if without_state =~ exact
+        trans = Regexp.new("#{city[1]}$")
+
+        return { city_name: city[0], start_at: without_state.rindex(city[0])  } if exact.match? without_state
+        return { city_name: city[0], start_at: transliterated.rindex(city[1]) } if trans.match? transliterated
       end
 
       #raise CityNotFound, "City not found"

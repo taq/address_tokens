@@ -46,7 +46,7 @@ describe AddressTokens::Matcher do
     end
 
     it 'must extract transliterated' do
-      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São    José  do     Rio    Preto   -  SP')
+      matches = @matcher.match @finder.string
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_start_at]).must_equal 54
     end
