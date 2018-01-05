@@ -74,4 +74,29 @@ describe AddressTokens::Finder do
       expect(finder.cities['SP'].include?('São José do Rio Preto')).must_equal true
     end
   end
+
+  describe 'find' do
+    it 'wont find with no states' do
+      -> {
+        finder.load(:cities, '/tmp/cities.yml')
+        finder.find
+      }.must_raise ArgumentError
+    end
+
+    it 'wont find with no cities' do
+      -> {
+        finder.load(:states, '/tmp/states.yml')
+        finder.find
+      }.must_raise ArgumentError
+    end
+
+    it 'must transliterate and load city tokens' do
+      finder.load(:states, '/tmp/states.yml')
+      finder.load(:cities, '/tmp/cities.yml')
+      finder.find
+
+      expect(finder.city_tokens['AC'][-10]).must_equal ['Plácido de Castro', 'placido de castro', ['placido', 'de', 'castro']]
+      expect(finder.city_tokens['AC'][-1]).must_equal  ['Xapuri', 'xapuri', ['xapuri']]
+    end
+  end
 end
