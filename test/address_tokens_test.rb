@@ -34,18 +34,18 @@ describe AddressTokens::Finder do
 
     it 'wont load states, if file not found' do
       -> {
-        finder.states = '/tmp/comeonyoudonthavesuchafiledoyou.txt'
+        finder.load(:states, '/tmp/comeonyoudonthavesuchafiledoyou.txt')
       }.must_raise IOError
     end
 
     it 'wont load states, if no YAML file' do
       -> {
-      finder.states = 'test.txt'
+      finder.load(:states, 'test.txt')
       }.must_raise TypeError
     end
 
     it 'must load states' do
-      finder.states = '/tmp/states.yml'
+      finder.load(:states, '/tmp/states.yml')
       expect(finder.states).must_be_kind_of Hash
       expect(finder.states['SP']).must_equal 'São Paulo'
     end
@@ -58,18 +58,18 @@ describe AddressTokens::Finder do
 
     it 'wont load cities, if file not found' do
       -> {
-        finder.cities = '/tmp/comeonyoudonthavesuchafiledoyou.txt'
+        finder.load(:cities, '/tmp/comeonyoudonthavesuchafiledoyou.txt')
       }.must_raise IOError
     end
 
     it 'wont load cities, if no YAML file' do
       -> {
-      finder.cities = 'test.txt'
+      finder.load(:cities, 'test.txt')
       }.must_raise TypeError
     end
 
     it 'must load cities' do
-      finder.cities = '/tmp/cities.yml'
+      finder.load(:cities, '/tmp/cities.yml')
       expect(finder.cities).must_be_kind_of Hash
       expect(finder.cities['SP'].include?('São José do Rio Preto')).must_equal true
     end

@@ -3,23 +3,20 @@ require 'address_tokens/version'
 
 module AddressTokens
   class Finder
-    attr_reader :states, :cities
+    attr_accessor :states, :cities
 
     def initialize(str)
       raise Exception, 'String is null or empty' if str.strip.size < 1
+      @states, @cities = {}, {}
     end
 
-    def states=(file)
-      load(file, 'states')
-    end
-
-    def cities=(file)
-      load(file, 'cities')
+    def load(var, file)
+      load_file(var, file)
     end
 
     private
 
-    def load(file, var)
+    def load_file(var, file)
       raise IOError, "File #{file} was not found" if !File.exist?(file)
       data = YAML.load(File.read(file))
       raise TypeError, "File #{file} is not a valid YAML file" if !data.kind_of?(Hash)
