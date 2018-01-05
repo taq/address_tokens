@@ -143,4 +143,15 @@ describe AddressTokens::Matcher do
       expect(matches[:address]).must_equal @address
     end
   end
+
+  describe 'string' do
+    it 'can change after creating the object' do
+      @finder.string = 'Rua das Couves, 123, Centro, Ribeirão Preto - SP'
+      result = @finder.find
+      expect(result[:state_abbr]).must_equal 'SP'
+      expect(result[:state_name]).must_equal 'São Paulo'
+      expect(result[:city_name]).must_equal  'Ribeirão Preto'
+      expect(result[:address]).must_equal    'Rua das Couves, 123, Centro,'
+    end
+  end
 end

@@ -3,8 +3,8 @@ require 'i18n'
 
 module AddressTokens
   class Finder
-    attr_accessor :states, :cities, :state_separator
-    attr_reader :city_tokens, :string
+    attr_accessor :states, :cities, :state_separator, :string
+    attr_reader :city_tokens
 
     def initialize(str)
       raise Exception, 'String is null or empty' if str.strip.size < 1
