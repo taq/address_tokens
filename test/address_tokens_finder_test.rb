@@ -40,7 +40,7 @@ describe AddressTokens::Finder do
 
     it 'wont load states, if no YAML file' do
       -> {
-      finder.load(:states, 'test.txt')
+        finder.load(:states, "#{File.dirname(__FILE__)}/test.txt")
       }.must_raise TypeError
     end
 
@@ -64,7 +64,7 @@ describe AddressTokens::Finder do
 
     it 'wont load cities, if no YAML file' do
       -> {
-      finder.load(:cities, 'test.txt')
+        finder.load(:cities, "#{File.dirname(__FILE__)}/test.txt")
       }.must_raise TypeError
     end
 
