@@ -68,7 +68,7 @@ module AddressTokens
       reversed = choices.sort_by { |choice| choice[2].size }.reverse
       regex    = reversed[0][2].scan(/./).map { |char| "#{char}[\\p{Latin}\.]*\\s+"}.join.strip[0..-4]
       matches = Regexp.new(regex, 'i').match(str)
-      { city_name: reversed[0][0], city_string: matches ? matches[0].strip : nil, start_at: -1 }
+      { city_name: reversed[0][0], city_string: matches ? matches[0].strip : nil, start_at: matches ? str.index(matches[0].strip) : -1 }
     end
 
     def find_city_by_exact_or_trans(cities, without_state, transliterated)

@@ -10,7 +10,7 @@ module AddressTokens
       raise Exception, 'String is null or empty' if str.strip.size < 1
       @string, @states, @cities, = str, {}, {}
       I18n.config.available_locales = :en
-      @state_separator = '-'
+      @state_separator = ','
     end
 
     def load(var, file)

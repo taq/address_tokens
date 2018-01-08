@@ -5,10 +5,12 @@ require_relative '../lib/city_not_found'
 describe AddressTokens::Matcher do
   before do
     @finder = AddressTokens::Finder.new('this is some mixed tokens on address 123 neighborhood sao José do Rio Preto -  SP')
+    @finder.state_separator = '-'
     @finder.load(:states, '/tmp/states.yml')
     @finder.load(:cities, '/tmp/cities.yml')
     @finder.find
     @matcher = AddressTokens::Matcher.new(@finder)
+    @github = '88 Colin P Kelly Jr St San Francisco, CA 94107'
   end
 
   describe 'state' do
@@ -17,6 +19,14 @@ describe AddressTokens::Matcher do
       expect(matches[:state_abbr]).must_equal 'SP'
       expect(matches[:state_name]).must_equal 'São Paulo'
       expect(matches[:state_start_at]).must_equal 76
+    end
+
+    it 'must extract from Github' do
+      @finder.state_separator = ','
+      matches = @matcher.match(@github)
+      expect(matches[:state_abbr]).must_equal 'CA'
+      expect(matches[:state_name]).must_equal 'California'
+      expect(matches[:state_start_at]).must_equal 36
     end
 
     it 'must extract state, using space separator' do
@@ -38,6 +48,14 @@ describe AddressTokens::Matcher do
       -> {
         expect(@matcher.match('address here city - SP'))
       }.must_raise AddressTokens::CityNotFound
+    end
+
+    it 'must extract by exact match, from Github' do
+      @finder.state_separator = ','
+      matches = @matcher.match(@github)
+      expect(matches[:city_name]).must_equal 'San Francisco'
+      expect(matches[:city_string]).must_equal 'San Francisco'
+      expect(matches[:city_start_at]).must_equal 23
     end
 
     it 'must extract by exact match' do
@@ -65,7 +83,7 @@ describe AddressTokens::Matcher do
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto -  SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_string]).must_equal 's J do R Preto'
-      expect(matches[:city_start_at]).must_equal(-1)
+      expect(matches[:city_start_at]).must_equal 54
 
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto -  SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
@@ -138,7 +156,7 @@ describe AddressTokens::Matcher do
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto    SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_string]).must_equal 's J do R Preto'
-      expect(matches[:city_start_at]).must_equal(-1)
+      expect(matches[:city_start_at]).must_equal 54
 
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto   SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
@@ -182,6 +200,12 @@ describe AddressTokens::Matcher do
     it 'must extract by exact match' do
       matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São José do Rio Preto -  SP')
       expect(matches[:address]).must_equal @address
+    end
+
+    it 'must extract by exact match, from Github' do
+      @finder.state_separator = ','
+      matches = @matcher.match(@github)
+      expect(matches[:address]).must_equal '88 Colin P Kelly Jr St'
     end
 
     it 'must extract by exact match removing spaces' do
@@ -232,6 +256,20 @@ describe AddressTokens::Matcher do
       expect(result[:state_name]).must_equal 'São Paulo'
       expect(result[:city_name]).must_equal  'Ribeirão Preto'
       expect(result[:address]).must_equal    'Rua das Couves, 123, Centro,'
+    end
+  end
+
+  describe 'bluefish' do
+    it 'will find us' do
+      @finder.state_separator = '-'
+      matches = @matcher.match 'Rua Tratado de Tordesihas, 88, Pq. Estoril, S. J. do Rio Preto - SP'
+      expect(matches[:state_abbr]).must_equal 'SP'
+      expect(matches[:state_name]).must_equal 'São Paulo'
+      expect(matches[:state_start_at]).must_equal 63
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'S. J. do Rio Preto'
+      expect(matches[:city_start_at]).must_equal 44
+      expect(matches[:address]).must_equal 'Rua Tratado de Tordesihas, 88, Pq. Estoril,'
     end
   end
 end
