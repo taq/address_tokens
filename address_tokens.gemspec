@@ -24,4 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
   spec.add_development_dependency "i18n"
+
+  spec.signing_key = '/home/taq/.gemcert/gem-private_key.pem'
+  spec.cert_chain = ['gem-public_cert.pem']
 end
