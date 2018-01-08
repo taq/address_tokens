@@ -26,7 +26,7 @@ module AddressTokens
       last_char = str.rindex(@finder.state_separator)
       token     = str[last_char .. -1]
       token     = token.gsub(/\s{2,}/, ' ')
-      matches   = token.match(Regexp.new("-\s?(?<state>\\w+)"))
+      matches   = token.match(Regexp.new("#{@finder.state_separator}\s?(?<state>\\w+)"))
       { state: matches[:state], start_at: last_char }
     end
 

@@ -18,6 +18,13 @@ describe AddressTokens::Matcher do
       expect(matches[:state_name]).must_equal 'São Paulo'
       expect(matches[:state_start_at]).must_equal 76
     end
+
+    it 'must extract state, using space separator' do
+      @finder.state_separator = ' '
+      @matcher = AddressTokens::Matcher.new(@finder)
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood sao José do Rio Preto SP')
+      expect(matches[:state_abbr]).must_equal 'SP'
+    end
   end
 
   describe 'city' do
@@ -58,7 +65,7 @@ describe AddressTokens::Matcher do
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto -  SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_string]).must_equal 's J do R Preto'
-      expect(matches[:city_start_at]).must_equal -1
+      expect(matches[:city_start_at]).must_equal(-1)
 
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto -  SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
@@ -89,6 +96,79 @@ describe AddressTokens::Matcher do
       expect(matches[:city_string]).must_equal 'S J R Preto'
 
       matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J Rio Preto -  SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'S J Rio Preto'
+    end
+  end
+
+  describe 'city, using space as state separator' do
+    before do
+      @finder.state_separator = ' '
+      @matcher = AddressTokens::Matcher.new(@finder)
+    end
+
+    it 'wont find with weird city' do
+      -> {
+        expect(@matcher.match('address here city SP'))
+      }.must_raise AddressTokens::CityNotFound
+    end
+
+    it 'must extract by exact match' do
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São José do Rio Preto SP')
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_start_at]).must_equal 54
+    end
+
+    it 'must extract by exact match removing spaces' do
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São    José  do     Rio    Preto   SP')
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_start_at]).must_equal 54
+    end
+
+    it 'must extract transliterated' do
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Sao    José  do     Rio    Preto   SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'Sao José do Rio Preto'
+      expect(matches[:city_start_at]).must_equal 54
+    end
+
+    it 'must extract written on a different way' do
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto    SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 's J do R Preto'
+      expect(matches[:city_start_at]).must_equal(-1)
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto   SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 's J do Rio Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São J do Rio Preto   SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'São J do Rio Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São José do R Preto   SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'São José do R Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S. J. do R. Preto   SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'S. J. do R. Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib Preto   SP'
+      expect(matches[:city_name]).must_equal 'Ribeirão Preto'
+      expect(matches[:city_string]).must_equal 'Rib Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib. Preto   SP'
+      expect(matches[:city_name]).must_equal 'Ribeirão Preto'
+      expect(matches[:city_string]).must_equal 'Rib. Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J R Preto   SP'
+      expect(matches[:city_name]).must_equal 'São José do Rio Preto'
+      expect(matches[:city_string]).must_equal 'S J R Preto'
+
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J Rio Preto   SP'
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_string]).must_equal 'S J Rio Preto'
     end
