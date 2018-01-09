@@ -17,11 +17,11 @@ module AddressTokens
       load_file(var, file)
     end
 
-    def find
+    def find(str = nil)
       raise ArgumentError, 'No states found' if @states.size == 0
       raise ArgumentError, 'No cities found' if @cities.size == 0
       transliterate_cities
-      Matcher.new(self).match(@string)
+      Matcher.new(self).match(str || @string)
     end
 
     private

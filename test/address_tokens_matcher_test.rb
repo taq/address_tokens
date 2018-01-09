@@ -257,6 +257,14 @@ describe AddressTokens::Matcher do
       expect(result[:city_name]).must_equal  'Ribeirão Preto'
       expect(result[:address]).must_equal    'Rua das Couves, 123, Centro,'
     end
+
+    it 'can use the find method to search for it' do
+      result = @finder.find('Rua das Couves, 123, Centro, Ribeirão Preto - SP')
+      expect(result[:state_abbr]).must_equal 'SP'
+      expect(result[:state_name]).must_equal 'São Paulo'
+      expect(result[:city_name]).must_equal  'Ribeirão Preto'
+      expect(result[:address]).must_equal    'Rua das Couves, 123, Centro,'
+    end
   end
 
   describe 'bluefish' do

@@ -95,6 +95,13 @@ p matches
 The `start_at` values shows where the strings were found. The `city_string` is 
 the way the city name was found.
 
+We can use the `find` method with an already instance of the `Finder` object
+sending a string to it:
+
+```ruby
+finder.find('my other string New York, Ny')
+```
+
 ### Custom options
 
 As we saw, the default city and states separator on USA is a comma (','), but on
@@ -142,7 +149,17 @@ release a new version, update the version number in `version.rb`, and then run
 git commits and tags, and push the `.gem` file to
 [rubygems.org](https://rubygems.org).
 
-Please run the tests using `rake test`.
+## Testing
+
+You can find some states and cities to run the tests here:
+
+- [https://github.com/taq/brstatescities/raw/master/states.yml](https://github.com/taq/brstatescities/raw/master/states.yml)
+- [https://github.com/taq/brstatescities/raw/master/cities.yml](https://github.com/taq/brstatescities/raw/master/cities.yml)
+
+Please insert `CA: California` on `states.yml` and `San Franscisco` on
+`cities.yml` to run the tests, using:
+
+`$ rake test`.
 
 ## Contributing
 
