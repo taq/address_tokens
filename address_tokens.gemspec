@@ -23,7 +23,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.16"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "minitest", "~> 5.0"
-  spec.add_development_dependency "i18n"
+  spec.add_development_dependency "i18n", "~> 0.7"
 
   spec.signing_key = '/home/taq/.gemcert/gem-private_key.pem'
   spec.cert_chain = ['gem-public_cert.pem']
