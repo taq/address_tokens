@@ -2,6 +2,9 @@ require "test_helper"
 
 describe AddressTokens::Finder do
   before do
+    raise IOError, 'States file not found' if !File.exist?('/tmp/states.yml')
+    raise IOError, 'Cities file not found' if !File.exist?('/tmp/cities.yml')
+
     @finder = AddressTokens::Finder.new('this is some mixed tokens on address 123 neighborhood sao José do Rio Preto -  SP')
     @finder.state_separator = '-'
   end 

@@ -1,11 +1,16 @@
 require "test_helper"
 require_relative '../lib/state_not_found'
 require_relative '../lib/city_not_found'
+require_relative '../lib/zip'
 
 describe AddressTokens::Matcher do
   before do
-    @finder = AddressTokens::Finder.new('this is some mixed tokens on address 123 neighborhood sao José do Rio Preto -  SP')
+    raise IOError, 'States file not found' if !File.exist?('/tmp/states.yml')
+    raise IOError, 'Cities file not found' if !File.exist?('/tmp/cities.yml')
+
+    @finder = AddressTokens::Finder.new('this is some mixed tokens on address 123 neighborhood 15085-110 sao José do Rio Preto -  SP')
     @finder.state_separator = '-'
+    @finder.zip_format = AddressTokens::Zip::BR
     @finder.load(:states, '/tmp/states.yml')
     @finder.load(:cities, '/tmp/cities.yml')
     @finder.find
@@ -18,7 +23,7 @@ describe AddressTokens::Matcher do
       matches = @matcher.match(@finder.string)
       expect(matches[:state_abbr]).must_equal 'SP'
       expect(matches[:state_name]).must_equal 'São Paulo'
-      expect(matches[:state_start_at]).must_equal 76
+      expect(matches[:state_start_at]).must_equal 86
     end
 
     it 'must extract from Github' do
@@ -76,7 +81,7 @@ describe AddressTokens::Matcher do
       matches = @matcher.match @finder.string
       expect(matches[:city_name]).must_equal 'São José do Rio Preto'
       expect(matches[:city_string]).must_equal 'sao José do Rio Preto'
-      expect(matches[:city_start_at]).must_equal 54
+      expect(matches[:city_start_at]).must_equal 64
     end
 
     it 'must extract written on a different way' do
@@ -198,7 +203,7 @@ describe AddressTokens::Matcher do
     end
 
     it 'must extract by exact match' do
-      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São José do Rio Preto -  SP')
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood 15085-110 São José do Rio Preto -  SP')
       expect(matches[:address]).must_equal @address
     end
 
@@ -208,8 +213,13 @@ describe AddressTokens::Matcher do
       expect(matches[:address]).must_equal '88 Colin P Kelly Jr St'
     end
 
+    it 'must extract without zipcode' do
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São José do Rio Preto -  SP')
+      expect(matches[:address]).must_equal @address
+    end
+
     it 'must extract by exact match removing spaces' do
-      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood São    José  do     Rio    Preto   -  SP')
+      matches = @matcher.match('this is some mixed tokens on address 123 neighborhood 15085-110 São    José  do     Rio    Preto   -  SP')
       expect(matches[:address]).must_equal @address
     end
 
@@ -219,32 +229,70 @@ describe AddressTokens::Matcher do
     end
 
     it 'must extract written on a different way' do
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do R Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 s J do R Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood s J do Rio Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 s J do Rio Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São J do Rio Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 São J do Rio Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood São José do R Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 São José do R Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S. J. do R. Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 S. J. do R. Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 Rib Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood Rib. Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 Rib. Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J R Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 S J R Preto -  SP'
       expect(matches[:address]).must_equal @address
 
-      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood S J Rio Preto -  SP'
+      matches = @matcher.match 'this is some mixed tokens on address 123 neighborhood 15085-110 S J Rio Preto -  SP'
       expect(matches[:address]).must_equal @address
+    end
+  end
+
+  describe 'zipcode' do
+    before do
+      @finder.zip_format = AddressTokens::Zip::BR
+    end
+
+    it 'must find zipcode' do
+      matches = @finder.find
+      expect(matches[:zipcode]).must_equal '15085-110'
+      expect(matches[:zipcode_string]).must_equal '15085-110'
+    end
+
+    it 'wont find zipcode' do
+      matches = @finder.find @finder.string.sub(/15085-110/, '1508x-x10')
+      expect(matches[:zipcode]).must_be_nil
+      expect(matches[:zipcode_string]).must_be_nil
+    end
+
+    it 'must find zipcode with different format' do
+      matches = @finder.find @finder.string.sub(/15085-110/, '15085110')
+      expect(matches[:zipcode]).must_equal '15085-110'
+      expect(matches[:zipcode_string]).must_equal '15085110'
+    end
+
+    #it 'must find zipcode even on the end of string' do
+      #matches = @finder.find @finder.string.sub(/15085-110/, '') + ' 15085-110'
+      #expect(matches[:zipcode]).must_equal '15085-110'
+      #expect(matches[:zipcode_string]).must_equal '15085-110'
+    #end
+
+    it 'must find github zipcode' do
+      @finder.zip_format      = AddressTokens::Zip::US
+      @finder.state_separator = ','
+      matches = @finder.find @github
+      expect(matches[:zipcode]).must_equal '94107'
+      expect(matches[:zipcode_string]).must_equal '94107'
     end
   end
 

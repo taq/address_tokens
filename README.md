@@ -69,7 +69,6 @@ Load the cities and states:
 ```ruby
 finder.load(:states, '/tmp/states.yml')
 finder.load(:cities, '/tmp/cities.yml')
-finder.find
 ```
 
 And ask to find:
@@ -81,7 +80,6 @@ matches = finder.find
 We'll get something like this:
 
 ```ruby
-p matches
 {
    :state_abbr     => "CA", 
    :state_name     => "California", 
@@ -89,11 +87,14 @@ p matches
    :city_name      => "San Francisco",
    :city_string    => "San Francisco",
    :city_start_at  => 23, 
-   :address        => "88 Colin P Kelly Jr St"
+   :address        => "88 Colin P Kelly Jr St",
+   :zipcode        => "94107",
+   :zipcode_string => "94107"
 }
 ```
-The `start_at` values shows where the strings were found. The `city_string` is 
-the way the city name was found.
+
+The `start_at` values shows where the strings were found. The `*_string` methods
+shows the way the strings were originally found.
 
 We can use the `find` method with an already instance of the `Finder` object
 sending a string to it:
@@ -106,17 +107,17 @@ finder.find('my other string New York, Ny')
 
 As we saw, the default city and states separator on USA is a comma (','), but on
 Brasil is a hyphen ('-'), so, **before asking to find the address**, we must
-change it:
+change it. The zipcode format is also different:
 
 ```ruby
 finder.state_separator = '-'
+finder.zip_format  = AddressTokens::Zip::BR
 ```
 
 Using a Brazilian address:
 
 ```ruby
-finder = AddressTokens::Finder.new('Rua Tratado de Tordesihas, 88, Pq. Estoril,
-S. J. do Rio Preto - SP')
+finder = AddressTokens::Finder.new('Rua Tratado de Tordesihas, 88, Pq. Estoril, 15085-110 S. J. do Rio Preto - SP')
 finder.state_separator = '-'
 finder.load(:states, '/tmp/states.yml')
 finder.load(:cities, '/tmp/cities.yml')
@@ -133,7 +134,9 @@ will return:
    :city_name        => "São José do Rio Preto", 
    :city_string      => "S. J. do Rio Preto", 
    :city_start_at    => 44, 
-   :address          => "Rua Tratado de Tordesihas, 88, Pq. Estoril,"
+   :address          => "Rua Tratado de Tordesihas, 88, Pq. Estoril,",
+   :zipcode        => "15085-110",
+   :zipcode_string => "15085-110"
 }
 ```
 

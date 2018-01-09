@@ -3,13 +3,14 @@ require 'i18n'
 
 module AddressTokens
   class Finder
-    attr_accessor :states, :cities, :state_separator, :string
+    attr_accessor :states, :cities, :state_separator, :string, :zip_format
     attr_reader :city_tokens
 
     def initialize(str = nil)
-      @string, @states, @cities, = str, {}, {}
       I18n.config.available_locales = :en
+      @string, @states, @cities, = str, {}, {}
       @state_separator = ','
+      @zip_format      = Zip::US
     end
 
     def load(var, file)

@@ -8,6 +8,7 @@ module AddressTokens
       state_info   = find_state(str)
       city_info    = find_city(str, state_info)
       address_info = find_address(str, city_info)
+      zip_info     = find_zip(str, address_info)
 
       {
         state_abbr:     state_info[:state],
@@ -16,7 +17,9 @@ module AddressTokens
         city_name:      city_info[:city_name],
         city_string:    city_info[:city_string],
         city_start_at:  city_info[:start_at],
-        address:        address_info[:address]
+        address:        address_info[:address],
+        zipcode:        zip_info[:zip],
+        zipcode_string: zip_info[:zip_string]
       }
     end
 
@@ -85,6 +88,15 @@ module AddressTokens
     def find_address(str, city_info)
       return { address: str[0 ... city_info[:start_at]].strip } if city_info[:start_at] > 0
       { address: str.split(city_info[:city_string])[0].strip }
+    end
+
+    def find_zip(str, address_info)
+      matches = str.match @finder.zip_format[:format]
+      joiner  = @finder.zip_format[:join] || [ nil ]
+      zip     = matches ? matches[1..-1].zip(joiner).flatten.join : nil
+      zip_str = matches ? matches[0] : nil
+      address_info[:address] = address_info[:address].sub(zip_str, '').strip if zip_str && address_info
+      { zip: zip, zip_string: zip_str }
     end
   end
 end
