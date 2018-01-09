@@ -13,16 +13,12 @@ describe AddressTokens::Finder do
   end
 
   describe 'constructor' do
-    it 'wont accept nil strings' do
-      -> {
-        AddressTokens::Finder.new(nil)
-      }.must_raise Exception
+    it 'accept nil strings' do
+      expect(AddressTokens::Finder.new(nil)).wont_be_nil
     end
 
-    it 'wont accept empty strings' do
-      -> {
-        AddressTokens::Finder.new('')
-      }.must_raise Exception
+    it 'accept empty strings' do
+      expect(AddressTokens::Finder.new('')).wont_be_nil
     end
 
     it 'accept non empty strings' do
@@ -91,6 +87,13 @@ describe AddressTokens::Finder do
         @finder.load(:states, '/tmp/states.yml')
         @finder.find
       }.must_raise ArgumentError
+    end
+
+    it 'wont find with an empty string' do
+      -> {
+        @finder.string = nil
+        @finder.find
+      }.must_raise Exception
     end
 
     it 'must transliterate and load city tokens' do

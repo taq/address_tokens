@@ -6,8 +6,7 @@ module AddressTokens
     attr_accessor :states, :cities, :state_separator, :string
     attr_reader :city_tokens
 
-    def initialize(str)
-      raise Exception, 'String is null or empty' if str.strip.size < 1
+    def initialize(str = nil)
       @string, @states, @cities, = str, {}, {}
       I18n.config.available_locales = :en
       @state_separator = ','
@@ -18,10 +17,13 @@ module AddressTokens
     end
 
     def find(str = nil)
-      raise ArgumentError, 'No states found' if @states.size == 0
-      raise ArgumentError, 'No cities found' if @cities.size == 0
+      raise ArgumentError, 'No states found'         if @states.size == 0
+      raise ArgumentError, 'No cities found'         if @cities.size == 0
       transliterate_cities
-      Matcher.new(self).match(str || @string)
+
+      what = str || @string
+      raise Exception, 'String is null or empty' if what.to_s.strip.size < 1
+      Matcher.new(self).match(what)
     end
 
     private
