@@ -281,11 +281,11 @@ describe AddressTokens::Matcher do
       expect(matches[:zipcode_string]).must_equal '15085110'
     end
 
-    #it 'must find zipcode even on the end of string' do
-      #matches = @finder.find @finder.string.sub(/15085-110/, '') + ' 15085-110'
-      #expect(matches[:zipcode]).must_equal '15085-110'
-      #expect(matches[:zipcode_string]).must_equal '15085-110'
-    #end
+    it 'must find zipcode even on the end of string' do
+      matches = @finder.find @finder.string.sub(/15085-110/, '') + ' 15085-110'
+      expect(matches[:zipcode]).must_equal '15085-110'
+      expect(matches[:zipcode_string]).must_equal '15085-110'
+    end
 
     it 'must find github zipcode' do
       @finder.zip_format      = AddressTokens::Zip::US

@@ -5,10 +5,10 @@ module AddressTokens
     end
 
     def match(str)
-      state_info   = find_state(str)
+      zip_info     = find_zip(str)
+      state_info   = find_state(str, zip_info)
       city_info    = find_city(str, state_info)
-      address_info = find_address(str, city_info)
-      zip_info     = find_zip(str, address_info)
+      address_info = remove_zip(find_address(str, city_info), zip_info)
 
       {
         state_abbr:     state_info[:state],
@@ -25,7 +25,15 @@ module AddressTokens
 
     private
 
-    def find_state(str)
+    def remove_end_zip_for_state(str, zip_info)
+      return str if !@finder.zip_format[:format].to_s.include?(@finder.state_separator) 
+      return str if !zip_info
+      return str if !zip_info[:zip_on_end]
+      str.strip.sub(Regexp.new("#{zip_info[:zip_string]}\\z"), '')
+    end
+
+    def find_state(str, zip_info)
+      str       = remove_end_zip_for_state(str, zip_info)
       last_char = str.rindex(@finder.state_separator)
       token     = str[last_char .. -1]
       token     = token.gsub(/\s{2,}/, ' ')
@@ -90,13 +98,18 @@ module AddressTokens
       { address: str.split(city_info[:city_string])[0].strip }
     end
 
-    def find_zip(str, address_info)
+    def find_zip(str)
       matches = str.match @finder.zip_format[:format]
       joiner  = @finder.zip_format[:join] || [ nil ]
       zip     = matches ? matches[1..-1].zip(joiner).flatten.join : nil
       zip_str = matches ? matches[0] : nil
-      address_info[:address] = address_info[:address].sub(zip_str, '').strip if zip_str && address_info
-      { zip: zip, zip_string: zip_str }
+      { zip: zip, zip_string: zip_str, zip_on_end: zip_str && Regexp.new("#{zip_str}\\z").match?(str) }
+    end
+
+    def remove_zip(address_info, zip_info)
+      return address_info if !address_info || !zip_info || !zip_info[:zip_string]
+      address_info[:address] = address_info[:address].sub(zip_info[:zip_string], '').strip
+      address_info
     end
   end
 end
