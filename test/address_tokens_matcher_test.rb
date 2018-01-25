@@ -1,7 +1,4 @@
 require "test_helper"
-require_relative '../lib/state_not_found'
-require_relative '../lib/city_not_found'
-require_relative '../lib/zip'
 
 describe AddressTokens::Matcher do
   before do
